@@ -1,0 +1,24 @@
+{% load static %}
+<!doctype html>
+<html lang="ru">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{% block title %}Заявки{% endblock %} | Service Desk</title>
+    <link rel="stylesheet" href="{% static 'desk.css' %}">
+</head>
+<body>
+    <header class="topbar">
+        <div class="wrap brand-row">
+            <a class="brand" href="{% url 'ticket-list' %}"><span aria-hidden="true">SD</span> Service Desk</a>
+            <span class="top-caption">Учёт обращений</span>
+        </div>
+    </header>
+    <main class="wrap workspace">
+        {% for message in messages %}
+            <p class="notice {{ message.tags }}" role="status">{{ message }}</p>
+        {% endfor %}
+        {% block content %}{% endblock %}
+    </main>
+</body>
+</html>

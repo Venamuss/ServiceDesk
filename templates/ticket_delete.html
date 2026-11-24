@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+{% block title %}Удаление заявки{% endblock %}
+{% block content %}
+    <div class="narrow">
+        <a class="back" href="{% url 'ticket-list' %}">← К списку заявок</a>
+        <h1>Удаление заявки</h1>
+        <p class="muted">Проверьте номер и тему перед удалением.</p>
+        <form class="panel editor" method="post">
+            {% csrf_token %}
+            <p class="delete-title">№{{ ticket.pk }} · {{ ticket.title }}</p>
+            <p class="muted">После подтверждения заявку нельзя восстановить.</p>
+            <div class="actions">
+                <button class="button danger" type="submit" name="confirm" value="yes">Подтвердить удаление</button>
+                <a class="button" href="{% url 'ticket-list' %}">Отмена</a>
+            </div>
+        </form>
+    </div>
+{% endblock %}

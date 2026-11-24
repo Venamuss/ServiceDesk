@@ -1,0 +1,84 @@
+{% extends 'base.html' %}
+{% block content %}
+    <div class="page-heading">
+        <div>
+            <p class="eyebrow">ЖУРНАЛ ОБРАЩЕНИЙ</p>
+            <h1>Заявки пользователей</h1>
+            <p class="muted">Добавляйте обращения и отслеживайте их до закрытия.</p>
+        </div>
+        <a class="button primary" href="{% url 'ticket-add' %}">+ Добавить заявку</a>
+    </div>
+    <form class="panel filters" method="get">
+        <div>
+            <label for="status-filter">Статус</label>
+            <select name="status" id="status-filter">
+                <option value="">Все статусы</option>
+                {% for value, label in status_choices %}
+                    <option value="{{ value }}"{% if value == status %} selected{% endif %}>{{ label }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div>
+            <label for="sort">Сортировка</label>
+            <select name="sort" id="sort">
+                <option value="newest"{% if sort == 'newest' %} selected{% endif %}>Сначала новые</option>
+                <option value="oldest"{% if sort == 'oldest' %} selected{% endif %}>Сначала старые</option>
+            </select>
+        </div>
+        <button class="button" type="submit">Применить</button>
+    </form>
+    <section aria-labelledby="list-heading">
+        <div class="section-heading">
+            <h2 id="list-heading">Список заявок</h2>
+            <span class="muted">Показано: {{ tickets|length }}</span>
+        </div>
+        {% if tickets %}
+            <div class="panel table-panel">
+                <table role="table" aria-labelledby="list-heading">
+                    <thead role="rowgroup">
+                        <tr role="row">
+                            <th role="columnheader" scope="col" aria-sort="{% if sort == 'oldest' %}ascending{% else %}descending{% endif %}">№</th>
+                            <th role="columnheader" scope="col">Заявка</th>
+                            <th role="columnheader" scope="col">Приоритет</th>
+                            <th role="columnheader" scope="col">Статус</th>
+                            <th role="columnheader" scope="col">Действия</th>
+                        </tr>
+                    </thead>
+                    <tbody role="rowgroup">
+                        {% for ticket in tickets %}
+                            <tr role="row" data-ticket="{{ ticket.pk }}">
+                                <td role="cell" class="ticket-number">№{{ ticket.pk }}</td>
+                                <td role="cell" class="ticket-content">
+                                    <strong>{{ ticket.title }}</strong>
+                                    <p class="muted description">{{ ticket.description }}</p>
+                                </td>
+                                <td role="cell">
+                                    <span class="mobile-label" aria-hidden="true">Приоритет</span>
+                                    <span class="badge priority-{{ ticket.priority }}">{{ ticket.get_priority_display }}</span>
+                                </td>
+                                <td role="cell">
+                                    <span class="mobile-label" aria-hidden="true">Статус</span>
+                                    <span class="badge status-{{ ticket.status }}">{{ ticket.get_status_display }}</span>
+                                </td>
+                                <td role="cell" class="ticket-actions">
+                                    <div class="actions">
+                                        {% if ticket.next_status %}
+                                            <form action="{% url 'ticket-status' ticket.pk %}" method="post">
+                                                {% csrf_token %}
+                                                <input type="hidden" name="status" value="{{ ticket.next_status }}">
+                                                <button class="button small" type="submit">{% if ticket.next_status == 'active' %}Взять в работу{% else %}Закрыть заявку{% endif %}</button>
+                                            </form>
+                                        {% endif %}
+                                        <a class="button danger small" href="{% url 'ticket-delete' ticket.pk %}">Удалить</a>
+                                    </div>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <p class="panel empty">{% if status %}Нет заявок с выбранным статусом.{% else %}Заявок пока нет. Нажмите «+ Добавить заявку», чтобы создать первую.{% endif %}</p>
+        {% endif %}
+    </section>
+{% endblock %}

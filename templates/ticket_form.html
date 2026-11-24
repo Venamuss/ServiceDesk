@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+{% block title %}Новая заявка{% endblock %}
+{% block content %}
+    <div class="narrow">
+        <a class="back" href="{% url 'ticket-list' %}">← К списку заявок</a>
+        <h1>Новая заявка</h1>
+        <p class="muted">Опишите обращение и укажите его приоритет.</p>
+        <form class="panel editor" method="post" novalidate>
+            {% csrf_token %}
+            {{ form.non_field_errors }}
+            {% for field in form %}
+                <div class="field">
+                    {{ field.label_tag }}
+                    {{ field }}
+                    {% if field.help_text %}
+                        <p id="{{ field.auto_id }}_helptext" class="hint">{{ field.help_text }}</p>
+                    {% endif %}
+                    {{ field.errors }}
+                </div>
+            {% endfor %}
+            <p class="initial-status">Статус при создании: <span class="badge status-new">Новая</span></p>
+            <div class="actions">
+                <button class="button primary" type="submit">Сохранить заявку</button>
+                <a class="button" href="{% url 'ticket-list' %}">Отмена</a>
+            </div>
+        </form>
+    </div>
+{% endblock %}
